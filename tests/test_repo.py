@@ -1,23 +1,61 @@
-from app.repositories.product_repository import ProductRepository
+# from app.repositories.product_repository import ProductRepository
 
-repo = ProductRepository()
+# repo = ProductRepository()
 
-# Test 1: total products loaded
-products = repo.all()
-print("Total products:", len(products))
+# # Test 1: total products loaded
+# products = repo.all()
+# print("Total products:", len(products))
 
-# Test 2: search
-results = repo.search_by_text("cooler bag")
-print("\nSearch results:")
-for p in results:
-    print(p.item_code, "-", p.description)
+# # Test 2: search
+# results = repo.search_by_text("cooler bag")
+# print("\nSearch results:")
+# for p in results:
+#     print(p.item_code, "-", p.description)
 
-# Test 3: find by item code
-product = repo.find_by_item_code("12039601")
-print("\nFind by item code:")
-print(product)
+# # Test 3: find by item code
+# product = repo.find_by_item_code("12039601")
+# print("\nFind by item code:")
+# print(product)
 
-# Test 4: find by model + size
-product = repo.find_by_model_and_size("120396", "")
-print("\nFind by model + size:")
-print(product)
+# # Test 4: find by model + size
+# product = repo.find_by_model_and_size("120396", "")
+# print("\nFind by model + size:")
+# print(product)
+
+
+# from app.repositories.stock_repository import StockRepository
+
+# repo = StockRepository()
+
+# # Test 1: quantity lookup
+# print("Quantity for 12043500:", repo.get_quantity("12043500"))
+
+# # Test 2: check stock availability
+# print("Is 12039601 in stock?", repo.is_in_stock("12039601"))
+# print("Is 12043500 in stock?", repo.is_in_stock("12043500"))
+
+# # Test 3: get full stock map
+# stock = repo.get_stock_map()
+# print("Total items in stock map:", len(stock))
+# print("Sample:", list(stock.items())[:5])
+
+from app.repositories.task_repository import TaskRepository
+from app.models.task import Task, TaskType
+
+repo = TaskRepository()
+
+# create task using factory method
+task = Task.create(
+    input="Find item code for cooler bag",
+    task_type=TaskType.product_support,
+)
+
+# save task
+repo.save(task)
+
+# retrieve task
+retrieved = repo.get(task.task_id)
+print("Retrieved task:", retrieved)
+
+# list all tasks
+print("All tasks:", repo.all())
