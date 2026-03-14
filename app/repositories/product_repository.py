@@ -28,7 +28,7 @@ class ProductRepository:
                             description=row["description"].strip(),
                             keywords=row.get("keywords", "").strip(),
                             item_code=row["item_code"].strip(),
-                            size=row.get("size", "ONE SIZE").strip(),
+                            size=(row.get("size") or "ONE SIZE").strip(),
                             category_code=row.get("category_code", "").strip(),
                             colors=row.get("colors", ""),
                             material=row.get("material", ""),

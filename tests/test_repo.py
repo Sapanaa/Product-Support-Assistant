@@ -39,23 +39,54 @@
 # print("Total items in stock map:", len(stock))
 # print("Sample:", list(stock.items())[:5])
 
-from app.repositories.task_repository import TaskRepository
-from app.models.task import Task, TaskType
+# from app.repositories.task_repository import TaskRepository
+# from app.models.task import Task, TaskType
 
-repo = TaskRepository()
+# repo = TaskRepository()
 
-# create task using factory method
-task = Task.create(
-    input="Find item code for cooler bag",
-    task_type=TaskType.product_support,
-)
+# # create task using factory method
+# task = Task.create(
+#     input="Find item code for cooler bag",
+#     task_type=TaskType.product_support,
+# )
 
-# save task
-repo.save(task)
+# # save task
+# repo.save(task)
 
-# retrieve task
-retrieved = repo.get(task.task_id)
-print("Retrieved task:", retrieved)
+# # retrieve task
+# retrieved = repo.get(task.task_id)
+# print("Retrieved task:", retrieved)
 
-# list all tasks
-print("All tasks:", repo.all())
+# # list all tasks
+# print("All tasks:", repo.all())
+
+from app.repositories.product_repository import ProductRepository
+from app.services.catalog_service import CatalogService
+
+# create repository
+repo = ProductRepository()
+
+# create service
+catalog = CatalogService(repo)
+
+# Test 1: search
+results = catalog.search("cooler bag")
+print("\nSearch results:")
+for p in results:
+    print(p.item_code, "-", p.description)
+
+# Test 2: get by item code
+product = catalog.get_by_item_code("12039601")
+print("\nProduct by item code:")
+print(product)
+
+# Test 3: get by model and size
+product = catalog.get_by_model_and_size("38106", "2XL")
+print("\nProduct by model + size:")
+print(product)
+
+# Test 4: get variants
+variants = catalog.get_variants("38106")
+print("\nVariants for model 38106:")
+for v in variants:
+    print(v.item_code, v.size)
