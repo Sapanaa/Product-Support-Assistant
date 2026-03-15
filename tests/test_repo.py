@@ -93,33 +93,123 @@
 
 
 
+# from app.repositories.product_repository import ProductRepository
+# from app.repositories.stock_repository import StockRepository
+# from app.services.stock_service import StockService
+
+
+# # initialize repositories
+# product_repo = ProductRepository()
+# stock_repo = StockRepository()
+
+# # create service
+# stock_service = StockService(stock_repo, product_repo)
+
+
+# # Test 1: quantity
+# print("\nQuantity for 12043500:")
+# print(stock_service.get_quantity("12043500"))
+
+
+# # Test 2: stock check
+# print("\nIs 12039601 in stock?")
+# print(stock_service.is_in_stock("12039601"))
+
+
+# # Test 3: related items in stock
+# print("\nRelated items in stock for 12039601:")
+
+# related = stock_service.get_related_in_stock("12046050")
+
+# for p in related:
+#     print(p.item_code, "-", p.description)
+
+
 from app.repositories.product_repository import ProductRepository
 from app.repositories.stock_repository import StockRepository
+
+from app.services.catalog_service import CatalogService
 from app.services.stock_service import StockService
 
+from app.agents.tools import (
+    CatalogSearchTool,
+    VariantLookupTool,
+    RelatedItemsTool,
+    StockCheckTool,
+)
 
-# initialize repositories
+from app.agents.orchestrator import AgentOrchestrator
+from app.models.task import Task, TaskType
+
+
+# ---------------------------------------------------
+# Setup repositories
+# ---------------------------------------------------
+
 product_repo = ProductRepository()
 stock_repo = StockRepository()
 
-# create service
+# ---------------------------------------------------
+# Setup services
+# ---------------------------------------------------
+
+catalog_service = CatalogService(product_repo)
 stock_service = StockService(stock_repo, product_repo)
 
+# ---------------------------------------------------
+# Setup tools
+# ---------------------------------------------------
 
-# Test 1: quantity
-print("\nQuantity for 12043500:")
-print(stock_service.get_quantity("12043500"))
+catalog_search_tool = CatalogSearchTool(catalog_service)
+variant_lookup_tool = VariantLookupTool(catalog_service)
+related_items_tool = RelatedItemsTool(stock_service)
+stock_check_tool = StockCheckTool(stock_service)
+
+# ---------------------------------------------------
+# Setup orchestrator
+# ---------------------------------------------------
+
+agent = AgentOrchestrator(
+    catalog_search=catalog_search_tool,
+    variant_lookup=variant_lookup_tool,
+    related_items=related_items_tool,
+    stock_check=stock_check_tool,
+)
+
+# ---------------------------------------------------
+# Test cases
+# ---------------------------------------------------
+
+tests = [
+    "Find item code for Oriole RPET drawstring bag",
+    "Is the Oriole mesh drawstring bag in stock?",
+    "Show alternatives for the Oriole RPET drawstring bag",
+    "Find item code for Sai RPET tote bag",
+    "Is the Hoss business laptop backpack available?",
+]
 
 
-# Test 2: stock check
-print("\nIs 12039601 in stock?")
-print(stock_service.is_in_stock("12039601"))
+for query in tests:
+    print("\n------------------------------------")
+    print("Query:", query)
 
+    task = Task.create(
+        input=query,
+        task_type=TaskType.product_support,
+    )
 
-# Test 3: related items in stock
-print("\nRelated items in stock for 12039601:")
+    result_task = agent.run(task)
 
-related = stock_service.get_related_in_stock("12046050")
+    print("Answer:", result_task.result.answer)
 
-for p in related:
-    print(p.item_code, "-", p.description)
+    if result_task.result.item_code:
+        print("Item code:", result_task.result.item_code)
+
+    if result_task.result.related_items:
+        print("Related items:")
+        for r in result_task.result.related_items:
+            print("-", r["item_code"])
+
+    print("Steps executed:")
+    for step in result_task.steps:
+        print(step.tool_name)

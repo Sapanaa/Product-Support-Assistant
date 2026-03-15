@@ -120,3 +120,17 @@ It combines data from the `StockRepository` and `ProductRepository` to provide i
 - is_in_stock(item_code) – returns True if the product is available in stock
 - get_quantity(item_code) – returns the quantity available for the item
 - get_related_in_stock(item_code) – returns related or variant products that are currently in stock
+
+---
+AgentOrchestrator
+    ↓
+CatalogSearchTool
+    ↓
+StockCheckTool
+    ↓
+Answer returned
+
+Tools are the actions the agent can perform.
+
+---
+Orchestrator.py
