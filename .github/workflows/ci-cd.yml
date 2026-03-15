@@ -59,7 +59,7 @@ jobs:
   # │  2. TEST — unit + API tests              │
   # └──────────────────────────────────────────┘
   test:
-    name: Test (Python ${{ env.PYTHON_VERSION }})
+    name: Test
     runs-on: ubuntu-latest
     needs: lint
 
