@@ -5,6 +5,7 @@ Tests covering:
   - variant lookup tool
   - FastAPI endpoints
 """
+
 import pytest
 from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
@@ -16,16 +17,20 @@ from app.services.stock_service import StockService
 from app.repositories.product_repository import ProductRepository
 from app.repositories.stock_repository import StockRepository
 from app.agents.tools import (
-    CatalogSearchTool, CatalogSearchInput,
-    VariantLookupTool, VariantLookupInput,
-    RelatedItemsTool, RelatedItemsInput,
-    StockCheckTool, StockCheckInput,
+    CatalogSearchTool,
+    CatalogSearchInput,
+    VariantLookupTool,
+    VariantLookupInput,
+    RelatedItemsTool,
+    RelatedItemsInput,
+    StockCheckTool,
+    StockCheckInput,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def sample_product() -> Product:
@@ -55,7 +60,7 @@ def product_repo(sample_product) -> ProductRepository:
 @pytest.fixture
 def stock_repo() -> StockRepository:
     repo = MagicMock(spec=StockRepository)
-    repo.is_in_stock.return_value = False   # item is out of stock by default
+    repo.is_in_stock.return_value = False  # item is out of stock by default
     repo.get_quantity.return_value = 0
     return repo
 
@@ -78,6 +83,7 @@ def client() -> TestClient:
 # ---------------------------------------------------------------------------
 # 1. Unit tests – catalog search tool
 # ---------------------------------------------------------------------------
+
 
 class TestCatalogSearchTool:
     def test_returns_matches_for_known_query(self, catalog_service, sample_product):
@@ -104,6 +110,7 @@ class TestCatalogSearchTool:
 # 2. Unit tests – stock check + related item fallback
 # ---------------------------------------------------------------------------
 
+
 class TestStockCheckTool:
     def test_out_of_stock_item(self, stock_service):
         tool = StockCheckTool(stock_service)
@@ -121,13 +128,17 @@ class TestStockCheckTool:
 
 
 class TestRelatedItemsTool:
-    def test_returns_in_stock_variants(self, stock_service, stock_repo, product_repo, sample_product):
+    def test_returns_in_stock_variants(
+        self, stock_service, stock_repo, product_repo, sample_product
+    ):
         """
         Same-model variant is in stock → should appear in related items.
         """
         # Give the product a non-empty related_items so the early-return guard is bypassed
         product_with_related = sample_product.model_copy(update={"related_items": "{}"})
-        variant = product_with_related.model_copy(update={"item_code": "12039602", "size": "M"})
+        variant = product_with_related.model_copy(
+            update={"item_code": "12039602", "size": "M"}
+        )
         # Primary item out of stock; variant in stock
         product_repo.find_by_item_code.return_value = product_with_related
         product_repo.find_by_model_code.return_value = [product_with_related, variant]
@@ -139,7 +150,9 @@ class TestRelatedItemsTool:
         codes = [r["item_code"] for r in result.related]
         assert "12039602" in codes
 
-    def test_returns_empty_when_no_related(self, stock_service, product_repo, stock_repo):
+    def test_returns_empty_when_no_related(
+        self, stock_service, product_repo, stock_repo
+    ):
         product_repo.find_by_item_code.return_value = None
         tool = RelatedItemsTool(stock_service)
         result = tool.run(RelatedItemsInput(item_code="99999999"))
@@ -150,6 +163,7 @@ class TestRelatedItemsTool:
 # ---------------------------------------------------------------------------
 # 3. Unit tests – variant lookup tool
 # ---------------------------------------------------------------------------
+
 
 class TestVariantLookupTool:
     def test_found(self, catalog_service, product_repo, sample_product):
@@ -170,6 +184,7 @@ class TestVariantLookupTool:
 # ---------------------------------------------------------------------------
 # 4. API endpoint tests
 # ---------------------------------------------------------------------------
+
 
 class TestHealthEndpoint:
     def test_health_ok(self, client):

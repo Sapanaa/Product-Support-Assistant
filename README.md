@@ -32,7 +32,7 @@ Swagger UI at `http://localhost:8000/docs`
 
 ## Dataset
 
-Place your catalog file at `data/products_feed.csv`. A sample is already included.
+Place your catalog file at `data/products_feed.csv`. 
 
 The file is loaded into memory on startup — no database setup required. Required columns:
 

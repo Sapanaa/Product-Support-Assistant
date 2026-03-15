@@ -60,9 +60,7 @@ class ProductRepository:
         scored.sort(key=lambda x: x[0], reverse=True)
         return [p for _, p in scored[:top_k]]
 
-    def find_by_model_and_size(
-        self, model_code: str, size: str
-    ) -> Optional[Product]:
+    def find_by_model_and_size(self, model_code: str, size: str) -> Optional[Product]:
         size_norm = size.strip().upper()
         for p in self._products:
             if p.model_code == model_code and p.size.upper() == size_norm:

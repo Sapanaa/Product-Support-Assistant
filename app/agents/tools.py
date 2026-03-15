@@ -3,16 +3,17 @@ Agent tool definitions.
 Each tool is a plain callable that accepts structured input and returns structured output.
 Tools are stateless; dependencies are injected at construction time.
 """
+
 from dataclasses import dataclass, field
 from typing import Optional
 from app.services.catalog_service import CatalogService
 from app.services.stock_service import StockService
 from app.models.product import Product
 
-
 # ---------------------------------------------------------------------------
 # Input / Output dataclasses (lightweight, no HTTP concern)
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CatalogSearchInput:
@@ -65,6 +66,7 @@ class StockCheckOutput:
 # ---------------------------------------------------------------------------
 # Tool implementations
 # ---------------------------------------------------------------------------
+
 
 def _product_to_dict(p: Product) -> dict:
     return {

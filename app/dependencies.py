@@ -2,6 +2,7 @@
 Dependency container – single source of truth for wiring all services.
 Import get_task_service() wherever the service is needed (FastAPI Depends, tests, etc.)
 """
+
 from functools import lru_cache
 from app.repositories.product_repository import ProductRepository
 from app.repositories.stock_repository import StockRepository

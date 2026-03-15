@@ -6,13 +6,18 @@ Routing is keyword/pattern-based (no LLM required), making behavior fully
 predictable and testable. The architecture is designed so a real LLM router
 can be dropped in by replacing _route().
 """
+
 import re
 from app.models.task import Task, TaskStatus, TaskResult, AgentStep
 from app.agents.tools import (
-    CatalogSearchTool, CatalogSearchInput,
-    VariantLookupTool, VariantLookupInput,
-    RelatedItemsTool, RelatedItemsInput,
-    StockCheckTool, StockCheckInput,
+    CatalogSearchTool,
+    CatalogSearchInput,
+    VariantLookupTool,
+    VariantLookupInput,
+    RelatedItemsTool,
+    RelatedItemsInput,
+    StockCheckTool,
+    StockCheckInput,
 )
 
 
@@ -38,7 +43,11 @@ class AgentOrchestrator:
             steps: list[AgentStep] = []
             result = self._route(task.input, steps)
             return task.model_copy(
-                update={"status": TaskStatus.completed, "result": result, "steps": steps}
+                update={
+                    "status": TaskStatus.completed,
+                    "result": result,
+                    "steps": steps,
+                }
             )
         except Exception as exc:
             return task.model_copy(
@@ -70,7 +79,14 @@ class AgentOrchestrator:
         # Intent: out of stock / related items / alternatives
         if any(
             kw in text
-            for kw in ("out of stock", "unavailable", "similar", "alternative", "replacement", "related")
+            for kw in (
+                "out of stock",
+                "unavailable",
+                "similar",
+                "alternative",
+                "replacement",
+                "related",
+            )
         ):
             return self._handle_related_items(user_input, steps)
 
@@ -85,16 +101,17 @@ class AgentOrchestrator:
     # Handlers
     # ------------------------------------------------------------------
 
-    def _handle_catalog_search(
-        self, query: str, steps: list[AgentStep]
-    ) -> TaskResult:
+    def _handle_catalog_search(self, query: str, steps: list[AgentStep]) -> TaskResult:
         inp = CatalogSearchInput(query=query)
         out = self._catalog_search.run(inp)
         steps.append(
             AgentStep(
                 tool_name=self._catalog_search.name,
                 input={"query": query},
-                output={"matches": [m["item_code"] for m in out.matches], "total": out.total},
+                output={
+                    "matches": [m["item_code"] for m in out.matches],
+                    "total": out.total,
+                },
             )
         )
 
@@ -144,9 +161,7 @@ class AgentOrchestrator:
             },
         )
 
-    def _handle_related_items(
-        self, query: str, steps: list[AgentStep]
-    ) -> TaskResult:
+    def _handle_related_items(self, query: str, steps: list[AgentStep]) -> TaskResult:
         # First find the product being referenced
         search_inp = CatalogSearchInput(query=query)
         search_out = self._catalog_search.run(search_inp)
@@ -184,7 +199,10 @@ class AgentOrchestrator:
             AgentStep(
                 tool_name=self._related_items.name,
                 input={"item_code": item_code},
-                output={"related": [r["item_code"] for r in related_out.related], "total": related_out.total},
+                output={
+                    "related": [r["item_code"] for r in related_out.related],
+                    "total": related_out.total,
+                },
             )
         )
 
@@ -219,9 +237,7 @@ class AgentOrchestrator:
             related_items=related_out.related[:5],
         )
 
-    def _handle_stock_check(
-        self, query: str, steps: list[AgentStep]
-    ) -> TaskResult:
+    def _handle_stock_check(self, query: str, steps: list[AgentStep]) -> TaskResult:
         search_inp = CatalogSearchInput(query=query)
         search_out = self._catalog_search.run(search_inp)
         steps.append(
