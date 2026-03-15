@@ -156,3 +156,5 @@ push → Lint → Test → Build → Deploy (main branch only)
 ```
 
 Add `DOCKER_USERNAME` and `DOCKER_PASSWORD` to your repository secrets to enable the deploy step.
+
+----
