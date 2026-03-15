@@ -139,8 +139,8 @@ docker run -p 8000:8000 sapana444/product-support-assistant:latest
 Or build locally from source:
 
 ```bash
-docker build -t catalogagent .
-docker run -p 8000:8000 catalogagent
+docker build -t product-support-assistant .
+docker run -p 8000:8000 product-support-assistant
 ```
 
 > **Image:** [`sapana444/product-support-assistant`](https://hub.docker.com/r/sapana444/product-support-assistant)
