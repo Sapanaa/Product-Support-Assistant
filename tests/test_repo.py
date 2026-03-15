@@ -60,33 +60,66 @@
 # # list all tasks
 # print("All tasks:", repo.all())
 
-from app.repositories.product_repository import ProductRepository
-from app.services.catalog_service import CatalogService
+# from app.repositories.product_repository import ProductRepository
+# from app.services.catalog_service import CatalogService
 
-# create repository
-repo = ProductRepository()
+# # create repository
+# repo = ProductRepository()
+
+# # create service
+# catalog = CatalogService(repo)
+
+# # Test 1: search
+# results = catalog.search("cooler bag")
+# print("\nSearch results:")
+# for p in results:
+#     print(p.item_code, "-", p.description)
+
+# # Test 2: get by item code
+# product = catalog.get_by_item_code("12039601")
+# print("\nProduct by item code:")
+# print(product)
+
+# # Test 3: get by model and size
+# product = catalog.get_by_model_and_size("38106", "2XL")
+# print("\nProduct by model + size:")
+# print(product)
+
+# # Test 4: get variants
+# variants = catalog.get_variants("38106")
+# print("\nVariants for model 38106:")
+# for v in variants:
+#     print(v.item_code, v.size)
+
+
+
+from app.repositories.product_repository import ProductRepository
+from app.repositories.stock_repository import StockRepository
+from app.services.stock_service import StockService
+
+
+# initialize repositories
+product_repo = ProductRepository()
+stock_repo = StockRepository()
 
 # create service
-catalog = CatalogService(repo)
+stock_service = StockService(stock_repo, product_repo)
 
-# Test 1: search
-results = catalog.search("cooler bag")
-print("\nSearch results:")
-for p in results:
+
+# Test 1: quantity
+print("\nQuantity for 12043500:")
+print(stock_service.get_quantity("12043500"))
+
+
+# Test 2: stock check
+print("\nIs 12039601 in stock?")
+print(stock_service.is_in_stock("12039601"))
+
+
+# Test 3: related items in stock
+print("\nRelated items in stock for 12039601:")
+
+related = stock_service.get_related_in_stock("12046050")
+
+for p in related:
     print(p.item_code, "-", p.description)
-
-# Test 2: get by item code
-product = catalog.get_by_item_code("12039601")
-print("\nProduct by item code:")
-print(product)
-
-# Test 3: get by model and size
-product = catalog.get_by_model_and_size("38106", "2XL")
-print("\nProduct by model + size:")
-print(product)
-
-# Test 4: get variants
-variants = catalog.get_variants("38106")
-print("\nVariants for model 38106:")
-for v in variants:
-    print(v.item_code, v.size)

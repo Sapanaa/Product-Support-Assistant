@@ -81,3 +81,42 @@ Agent processes request
   │
   ▼
 Task updated with result
+
+----
+
+## Catalog Service
+
+The `CatalogService` provides a layer between the API/agent and the product repository.  
+It exposes simple methods for searching products and retrieving product information.
+
+### Features
+
+- Search products by text query
+- Retrieve product by item code
+- Retrieve product by model code and size
+- Retrieve all variants of a product model
+
+### Methods
+
+- search(query) – search products using description and keywords
+- get_by_item_code(item_code) – retrieve a product by item code
+- get_by_model_and_size(model_code, size) – retrieve a product variant
+- get_variants(model_code) – return all variants of a product mode
+
+---
+## Stock Service
+
+The `StockService` handles stock availability and quantity checks for products.  
+It combines data from the `StockRepository` and `ProductRepository` to provide inventory information and suggest alternatives when a product is out of stock.
+
+### Features
+
+- Check if a product is in stock
+- Retrieve the available quantity of a product
+- Suggest related or variant products that are currently in stock
+
+### Methods
+
+- is_in_stock(item_code) – returns True if the product is available in stock
+- get_quantity(item_code) – returns the quantity available for the item
+- get_related_in_stock(item_code) – returns related or variant products that are currently in stock
