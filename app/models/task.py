@@ -2,7 +2,9 @@ from pydantic import BaseModel
 from typing import Any, Optional
 from enum import Enum
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+
+UTC = timezone.utc
 
 
 class TaskType(str, Enum):
@@ -45,5 +47,5 @@ class Task(BaseModel):
             status=TaskStatus.pending,
             input=input,
             task_type=task_type,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(UTC),
         )
